@@ -3,12 +3,12 @@
     box-sizing: border-box;
     margin: 70px auto;
     display: flex;
-    flex-direction: column; 
-    justify-content: space-between;    
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .enter-form__greeting {
-    margin: 40px 0;     
+    margin: 40px 0;
     font-size: 24px;
     font-weight: 500;
     line-height: 1,2;
@@ -19,11 +19,11 @@
 .enter-form__set {
     margin: 0 auto 18px;
     width: 100%;
-    display: flex;    
-    flex-direction: column;  
-    padding: 0; 
+    display: flex;
+    flex-direction: column;
+    padding: 0;
     border: none;
-    position: relative; 
+    position: relative;
 }
 
 .enter-form__field {
@@ -31,11 +31,11 @@
     flex-direction: column;
     position: relative;
     padding: 0;
-    margin: 0;    
-    border: none;   
+    margin: 0;
+    border: none;
 }
 
-.enter-form__label {   
+.enter-form__label {
     font-weight: 400;
     font-size: 10px;
     line-height: 1.2;
@@ -50,24 +50,24 @@
     font-weight: 500;
     line-height: 1.2;
     color: #fff;
-    letter-spacing: 0em;    
+    letter-spacing: 0em;
     border: none;
     outline: none;
     white-space: nowrap;
-    overflow: hidden; 
+    overflow: hidden;
     padding-bottom: 10px;
     border: none;
     border-bottom: 1px solid #424242;
-    margin-bottom: 24px;   
-    background: #202020;      
+    margin-bottom: 24px;
+    background: #202020;
 }
 
 .enter-form__input:focus {
-    font-weight: 500;    
+    font-weight: 500;
   }
 
   .enter-form__input:invalid {
-    color: #ee3465;   
+    color: #ee3465;
   }
 
   .enter-form__input:last-of-type {
@@ -78,13 +78,13 @@
     color: #ee3465;
     font-size: 10px;
     font-weight: 400;
-    line-height: 1.2;      
+    line-height: 1.2;
     width: 100%;
     position: absolute;
     top: -30px;
-    padding: 0;      
-  } 
-  
+    padding: 0;
+  }
+
   .enter-form__error_server {
     font-size: 14px;
     line-height: 1.2;
@@ -96,14 +96,14 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 100%;    
-    margin: 100% auto 0;   
+    width: 100%;
+    margin: 197px auto 0;
     align-self: flex-end;
   }
 
 .enter__submit-btn {
     width: 100%;
-    height: 45px;    
+    height: 45px;
     background-color: #4285F4;
     font-size: 14px;
     font-weight: 500;
@@ -114,7 +114,7 @@
     padding: 13px 0 15px;
     border: none;
     border-radius: 3px;
-    margin: 30px auto 16px;    
+    margin: 30px auto 16px;
 }
 
 .enter__submit-btn_disabled {
@@ -131,36 +131,36 @@
     justify-content: center;
     margin: 0 auto;
     text-decoration: none;
-    color: #8B8B8B;      
+    color: #8B8B8B;
 }
 
 .enter__link {
     text-decoration: none;
     color:#4285F4;
-    margin-left: 6px;    
+    margin-left: 6px;
 }
 
 @media screen and (max-width: 1024px) {
     .enter-form {
-        margin: 232px auto;    
+        margin: 232px auto;
     }
 
     .enter__submit-btn {
         margin-top: 69px;
     }
   }
-  
+
   @media screen and (max-width: 425px) {
     .enter-form {
         width: 100%;
-        margin: 56px auto 30px;    
-    }    
-    
+        margin: 56px auto 30px;
+    }
+
     .enter-form__logo {
        display: flex;
        margin: 0 auto;
     }
-    
+
     .enter-form__greeting {
         font-size: 24px;
         font-weight: 500;
@@ -168,20 +168,20 @@
         padding: 50px 0px 80px;
         margin: 0 auto;
     }
-    
+
     .enter-form__set {
         margin: 0 auto;
-        width: calc(100% - 60px);          
-        padding-bottom: 65px;   
-    }     
-    
-    .enter__submit-btn {        
-        font-size: 12px;            
-        margin: 30px auto 14px; 
-        max-width: 260px;       
+        width: calc(100% - 60px);
+        padding-bottom: 65px;
     }
-    
+
+    .enter__submit-btn {
+        font-size: 12px;
+        margin: 30px auto 14px;
+        max-width: 260px;
+    }
+
     .enter__text {
-        font-size: 12px;             
-    }  
+        font-size: 12px;
+    }
   }
