@@ -1,0 +1,169 @@
+.about-project { 
+    display: flex;   
+    flex-direction: column;
+    max-width: 1140px;    
+    align-items: center;
+    padding: 110px 70px;
+    margin: 0 auto;
+}  
+
+.about-project__section {
+    line-height: 1.23;   
+}
+
+.about-project__list {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    margin: 70px 0 0 0;
+    list-style: none;
+    padding: 0;
+}
+
+.about-project__item {
+    margin-bottom: 110px;
+}
+
+.about-project__subtitle {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.04em;    
+    margin-bottom: 26px;
+    padding: 0;    
+}
+
+.about-project__text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: 0em;    
+    padding: 0;
+}
+
+.about-project__term {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 4fr;
+    grid-template-rows: repeat(2, 36px);    
+    padding: 0;
+    list-style: none;     
+}
+
+.about-project__week {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.21;    
+    padding: 9.5px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    background: #303030;
+    margin: 0;
+}
+
+.about-project__week_green {
+    color: #000;
+    background: #3DDC84;
+}
+
+.about-project__direction {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 17px;
+    letter-spacing: 0px;
+    text-align: center;
+    justify-content: center;    
+    display: flex;
+    align-items: center;
+    color: #8B8B8B; 
+    padding-top: 14px;
+    margin: 0;   
+}
+
+@media screen and (max-width: 1023px) {
+    .about-project {
+       max-width: 923px;
+       padding: 90px 50px;     
+    }    
+
+    .about-project__list {
+        column-gap: 30px; 
+    }
+
+    .about-project__item {
+       margin-bottom: 93px;
+    }
+
+    .about-project__subtitle {      
+        margin-bottom: 22px;       
+    }
+
+    .about-project__text {
+        font-size: 12px;
+        line-height: 1.5;     
+    }
+  
+    .about-project__direction {
+       font-family: 'Suisse Intl';
+       font-weight: 400;
+       font-size: 14px;        
+    }
+}
+  
+  @media screen and (max-width: 767px) {
+    .about-project {
+      max-width: 708px;
+      padding: 70px 30px;
+    }    
+
+    .about-project__list {
+        grid-template-columns: 1fr;
+        gap: 56px;
+        margin-bottom: 60px;                
+    }
+
+    .about-project__item {
+       margin-bottom: 0;
+    }
+
+    .about-project__subtitle {
+        margin-bottom: 16px;
+        font-size: 18px;
+        letter-spacing: -0.04em;
+        padding: 0;
+    }
+
+    .about-project__text {
+        font-size: 11px;
+        line-height: 1.45;     
+    }
+
+    .about-project__term {
+        grid-template-columns: minmax(100px, 1fr) 4fr;
+        grid-template-rows: repeat(2, 35px);
+    }
+
+    .about-project__week {
+        font-size: 11px;
+        padding: 11px 0;   
+    }
+
+    .about-project__direction {  
+        font-size: 11px;    
+        padding-top: 10px; 
+    }
+  }
+
+  @media screen and (max-width: 475px) {
+    .about-project {
+        max-width: 284px;
+        padding: 70px 18px;        
+     } 
+     
+     .about-project__list {
+        margin: 60px 0;                
+    }
+}

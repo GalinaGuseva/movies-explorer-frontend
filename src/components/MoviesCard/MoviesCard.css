@@ -1,0 +1,95 @@
+.movies-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0;
+    min-height: 271px;
+    background-color: #222222;
+    box-shadow: 0px 4px 30px 0px #00000014; 
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  
+  .movies-card__header {
+    padding: 14px;
+    display: flex;     
+    justify-content: space-between;      
+  }
+  
+  .movies-card__description {
+    display: flex;
+    flex-direction: column;  
+    justify-content: space-between;    
+  }
+
+  .movies-card__title {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0px;
+    padding-bottom: 9px;
+    margin: 0;    
+  }
+  
+  .movies-card__duration {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: 0px;
+    color: #8b8b8b;
+    padding: 0;
+    margin: 0;
+  } 
+  
+  .movies-card__unsaved { 
+    display: block;      
+    background:#313131;
+    border: 1px solid #424242;    
+    padding: 15px;     
+    background-image: url(../../images/flag.svg); 
+    background-size: 10px;
+    background-repeat: no-repeat;
+    background-position: center;   
+  }  
+  
+  .movies-card__saved {    
+    display: block;
+    background: #2be080;
+    background-position: center;     
+    background-repeat: no-repeat;
+    padding: 15px;      
+    background-image: url(../../images/save.svg);
+    background-size: 10px;       
+  } 
+  
+  .movies-card__delete { 
+    display: block;
+    background: #313131;
+    background-position: center;     
+    background-repeat: no-repeat;   
+    padding: 15px;      
+    background-image: url(../../images/delete.svg);   
+  }
+
+  .movies-card__image {    
+    width: 100%;   
+    height: 203px;
+    vertical-align: top;
+    object-fit: cover;
+    object-position: center;    
+  }  
+  
+  @media screen and (max-width: 768px) {
+    .movies-card__image {
+      height: 190px;
+    }
+  }
+
+  @media screen and (max-width: 475px) {     
+    .movies-card__image {      
+      height: 168px;
+    }    
+  }
+  
