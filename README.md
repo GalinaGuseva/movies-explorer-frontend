@@ -34,3 +34,5 @@ Frontend дипломного проекта курса веб-разработ�
 
 
 ### ССылка на макет https://disk.yandex.ru/d/sv4_8CI65Mbazg
+
+### ССылка на pull-request https://github.com/GalinaGuseva/movies-explorer-frontend/pull/2
