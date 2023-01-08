@@ -42,5 +42,8 @@ export default function Footer() {
     { path: '/', element: <FooterShow /> },
     { path: '/movies', element: <FooterShow /> },
     { path: '/saved-movies', element: <FooterShow /> },
+    { path: '/signup', element: '' },
+    { path: '/signin', element: '' },
+    { path: '/profile', element: '' },
   ]);
 }

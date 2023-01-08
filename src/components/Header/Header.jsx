@@ -4,20 +4,14 @@ import HeaderMain from './HeaderMain';
 import HeaderLanding from './HeaderLanding';
 import './Header.css';
 
-export default function Header({ openMenu }) {
+export default function Header({ isLoggedIn, openMenu }) {
   return useRoutes([
-    { path: '/', element: <HeaderLanding /> },
-    {
-      path: '/movies',
-      element: <HeaderMain onShowMenu={openMenu} />,
-    },
-    {
-      path: '/saved-movies',
-      element: <HeaderMain onShowMenu={openMenu} />,
-    },
-    {
-      path: '/profile',
-      element: <HeaderMain onShowMenu={openMenu} />,
-    },
-  ]);
+    { path: '/', element: isLoggedIn ? <HeaderMain onShowMenu={openMenu} /> : <HeaderLanding /> },
+
+    { path: '/movies', element: <HeaderMain onShowMenu={openMenu} /> },
+    { path: '/saved-movies', element: <HeaderMain onShowMenu={openMenu} /> },
+    { path: '/signup', element: '' },
+    { path: '/signin', element: '' },
+    { path: '/profile', element: <HeaderMain onShowMenu={openMenu} /> },
+  ])
 }
