@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:3002";
+const BASE_URL = process.env.NODE_ENV === 'production'
+? "https://api.gal.nomoredomains.club"
+: "http://localhost:3002";
 
 const request = ({ url, method = "POST", data }) => {
   return fetch(`${BASE_URL}${url}`, {
