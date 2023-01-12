@@ -32,7 +32,6 @@ Frontend [дипломного проекта](https://gal.nomoredomains.club) �
 
 ### Домен приложения: https://gal.nomoredomains.club
 
+### Ссылка на макет https://disk.yandex.ru/d/sv4_8CI65Mbazg
 
-### ССылка на макет https://disk.yandex.ru/d/sv4_8CI65Mbazg
-
-### ССылка на pull-request https://github.com/GalinaGuseva/movies-explorer-frontend/pull/2
+### ССсылка на pull-request https://github.com/GalinaGuseva/movies-explorer-frontend/pull/2
