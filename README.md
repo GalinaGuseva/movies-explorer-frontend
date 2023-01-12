@@ -30,7 +30,7 @@ Frontend дипломного проекта курса веб-разработ�
 - ReactJS
 
 
-### Домен приложения: https://api.gal.nomoredomains.club
+### Домен приложения: https://gal.nomoredomains.club
 
 
 ### ССылка на макет https://disk.yandex.ru/d/sv4_8CI65Mbazg

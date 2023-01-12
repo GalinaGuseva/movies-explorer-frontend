@@ -4,21 +4,26 @@ import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import Preloader from "../Preloader/Preloader";
 import * as mainApi from "../../utils/MainApi";
+import { SCREEN_SIZE } from "../../constants/constants";
 
 export default function Movies({
   savedMovies,
   setSavedMovies,
   foundMovies,
   isLoading,
-  filter,
-  setFilter,
-  findMovies,
-  error
+  search,
+  onClickCheckBox,
+  isShort,
+  handleChange,
+  handleSubmit,
+  error,
+  filmError
 }) {
   const [сountCards, setCountCards] = useState(null); // число карточек для отображения
   const [addCountCards, setAddCountCards] = useState(null); // число добавляемых карточек
   const [visibleMovies, setVisibleMovies] = useState([]); // фильмы, которые будут отображаться
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { desktop, tablet, mobile } = SCREEN_SIZE;
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,17 +36,17 @@ export default function Movies({
   }, []);
 
   useEffect(() => {
-    if (screenWidth > 1024) {
-        setCountCards(12);
-        setAddCountCards(3);
-    } else if (screenWidth <= 1024 && screenWidth > 500) {
-        setCountCards(8);
-        setAddCountCards(2);
+    if (screenWidth > desktop.width) {
+        setCountCards(desktop.cards);
+        setAddCountCards(desktop.addCards);
+    } else if (screenWidth <= desktop.width && screenWidth > desktop.mobile) {
+        setCountCards(tablet.cards);
+        setAddCountCards(tablet.addCards);
     } else {
-        setCountCards(5);
-        setAddCountCards(1);
+      setCountCards(mobile.cards);
+      setAddCountCards(mobile.addCards);
     }
-  }, [screenWidth, foundMovies]);
+  }, [screenWidth, desktop, tablet, mobile]);
 
   useEffect(() => {
     const newMovies = foundMovies.slice(0, сountCards);
@@ -83,15 +88,18 @@ export default function Movies({
   return (
     <section className="movies">
       <SearchForm
-        handleSearch={findMovies}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
         isLoading={isLoading}
-        filter={filter}
-        setFilter={setFilter}
+        search={search}
+        errorText={error}
+        isShort={isShort}
+        onClickCheckBox={onClickCheckBox}
       />
       {isLoading ? (
         <Preloader />
-      ) : error ? (
-        <p className="movies__error">{error}</p>
+      ) : filmError ? (
+        <p className="movies__error">{filmError}</p>
       ) : (
         <>
           <MoviesCardList

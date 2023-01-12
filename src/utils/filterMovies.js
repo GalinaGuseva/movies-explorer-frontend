@@ -1,12 +1,14 @@
-export const filterMovies = (movies, filter) => {
+export const filterShortMovies = (movies) => {
+  return movies.filter((item) => item.duration <= 40);
+};
+
+export const filterMovies = (movies, search, isShort) => {
   const filteredMovies = movies.filter((item) => {
-    const lowerCaseNameRU = item.nameRU?.toLowerCase() || "";
-    const lowerCaseNameEN = item.nameEN?.toLowerCase() || "";
-  return (
-    (lowerCaseNameRU.includes(filter?.query?.toLowerCase()) ||
-    lowerCaseNameEN.includes(filter?.query?.toLowerCase())) &&
-    (filter.isShort ? item.duration <= 40 : true)
-    )
+    return (
+      (item.nameRU.toLowerCase().includes(search.toLowerCase()) ||
+        item.nameEN.toLowerCase().includes(search.toLowerCase())) &&
+      (isShort ? item.duration <= 40 : true)
+    );
   });
   return filteredMovies;
 }

@@ -13,22 +13,26 @@ import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import * as mainApi from "../../utils/MainApi";
 import { getMovies } from "../../utils/MoviesApi";
-import { filterMovies } from "../../utils/filterMovies";
-import { errorMessages } from "../../constants/constants";
+import { ERRORS } from "../../constants/constants";
+import { filterMovies, filterShortMovies } from "../../utils/filterMovies";
 
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [errorText, setErrorText] = useState(false);
+  const [searchError, setSearchError] = useState(false);
+  const [filmError, setFilmError] = useState(false);
   const [success, setIsSuccess] = useState(false);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
-  const [initialMovies, setInitialMovies] = useState([]);
-  const [foundMovies, setFoundMovies] = useState([]);
   const [savedMovies, setSavedMovies] = useState([]);
+  const [isShort, setIsShort] = useState(false);
+  const [search, setSearch] = useState("");
+  const [initMovies, setInitMovies] = useState([]);
+  const [foundMovies, setFoundMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [filter, setFilter] = useState({ query: "", isShort: false });
+
 
   const authCheck = () => {
     mainApi
@@ -54,17 +58,13 @@ export default function App() {
   const handleRegister = (data) => {
       mainApi
         .register(data)
-        .then(() => {
-            setIsSuccess(true);
-            setTimeout(() => setIsSuccess(false), 1000);
-            handleLogin(data)
-         })
-         .catch(err => {
+        .then(() => handleLogin(data))
+        .catch(err => {
           if (err === "Ошибка 409") {
-            setErrorText(errorMessages.conf);
+            setErrorText(ERRORS.conf);
             setTimeout(() => setErrorText(false), 2000);
           } else {
-            setErrorText(errorMessages.reg);
+            setErrorText(ERRORS.reg);
             setTimeout(() => setErrorText(false), 2000);
           }
           console.log(err);
@@ -75,21 +75,16 @@ export default function App() {
       return mainApi
         .login(data)
         .then(() => {
-          setInitialMovies([]);
-          setFoundMovies([]);
-          setFilter({ query: "", isShort: false });
           setIsSuccess(true);
           setTimeout(() => setIsSuccess(false), 2000);
-          setLoggedIn(true);
-          authCheck();
-          setTimeout(() => navigate("/movies"), 2000);
+          setTimeout(() => setLoggedIn(true), 2000);
         })
         .catch(err => {
           if (err === "Ошибка: 401") {
-            setErrorText(errorMessages.err);
+            setErrorText(ERRORS.err);
             setTimeout(() => setErrorText(false), 2000);
           } else {
-            setErrorText(errorMessages.auth);
+            setErrorText(ERRORS.auth);
             setTimeout(() => setErrorText(false), 2000);
           }
           console.log(err);
@@ -122,56 +117,82 @@ export default function App() {
         })
         .catch(err => {
           if (err) {
-            setErrorText(errorMessages.prof);
+            setErrorText(ERRORS.prof);
             setTimeout(() => setErrorText(false), 3000);
           }
           console.log(err);
         });
   };
 
-    function toggleMenu() {
+  function toggleMenu() {
     setIsMenuOpen(!isMenuOpen);
-  }
+  };
 
-  useEffect(() => {
-    if (initialMovies.length && isLoggedIn) {
-      const filteredMovies = filterMovies(initialMovies, filter);
-      setFoundMovies(filteredMovies);
-      localStorage.setItem("foundMovies", JSON.stringify(filteredMovies));
+  const checkShortMovies = (isShort) => {
+    setIsShort(isShort);
+    localStorage.setItem("onlyShort", JSON.stringify(isShort));
+};
+
+  const checkSearch = (search) => {
+    setSearch(search);
+    localStorage.setItem("search", search);
+};
+
+const checkMovies = (movies) => {
+  setInitMovies(movies);
+  localStorage.setItem('movies', JSON.stringify(movies));
+};
+
+const checkFoundMovies = (initMovies, search, isShort) => {
+  if (search) {
+     const newMovies = filterMovies(initMovies, search);
+     const shortMovies = filterShortMovies(newMovies);
+     const filteredMovies = isShort ? shortMovies : newMovies;
+     setFoundMovies(filteredMovies);
+     localStorage.setItem("foundMovies", JSON.stringify(filteredMovies));
       if (filteredMovies.length === 0) {
-        setErrorText(errorMessages.mov);
-      } else setErrorText("");
+        setFilmError(ERRORS.mov);
+      } else {
+        setFilmError("");
+      }
     }
-  }, [initialMovies, filter, isLoggedIn]);
+ };
 
   useEffect(() => {
-    if (localStorage.getItem("foundMovies")) {
-      setFoundMovies(JSON.parse(localStorage.getItem("foundMovies")));
-    }
-    if (localStorage.getItem("filter")) {
-      setFilter(JSON.parse(localStorage.getItem("filter")));
-    }
-  }, [isLoggedIn]);
-
-
-  const findMovies = (req) => {
-    if (!initialMovies.length) {
+    const movies = JSON.parse(localStorage.getItem("movies"));
+    checkMovies(movies);
+    checkFoundMovies(JSON.parse(localStorage.getItem("foundMovies")));
+    if (search) {
+    checkSearch(localStorage.getItem("search"));
+  }
+  if (isShort) {
+    checkShortMovies(JSON.parse(localStorage.getItem("onlyShort")));
+  }
+    if (!movies || !movies.length) {
       setIsLoading(true);
       getMovies()
-        .then((res) => {
-          setInitialMovies(res);
-          localStorage.setItem("movies", JSON.stringify(res));
+        .then(movies => {
+          checkMovies(movies);
+          checkFoundMovies(movies);
         })
         .catch((err) => {
-          setErrorText(errorMessages.default);
+          setErrorText(ERRORS.default);
           console.log(err);
         })
         .finally(() => {
           setIsLoading(false);
         });
       }
-      setFilter(req);
-         localStorage.setItem("filter", JSON.stringify(req));
+  }, [search, isShort]);
+
+  const findMoviesSubmit = (e) => {
+    e.preventDefault();
+    if (!search) {
+      setSearchError(ERRORS.search)
+      setTimeout(() => setSearchError(""), 2000);
+      return
+    }
+      checkFoundMovies(initMovies, search, isShort);
     };
 
   useEffect(() => {
@@ -188,6 +209,11 @@ export default function App() {
     }
   }, [isLoggedIn]);
 
+  useEffect(() => {
+    if ((location.pathname === "/signup" || location.pathname === "/signin") && isLoggedIn) {
+      navigate("/movies")};
+  }, [ isLoggedIn, location.pathname, navigate]);
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
     <div className="App">
@@ -198,19 +224,22 @@ export default function App() {
           <Route path="/movies" element={<ProtectedRoute path="/movies" isLoggedIn={isLoggedIn}>
             <Movies
               isLoading={isLoading}
-              filter={filter}
-              setFilter={setFilter}
-              findMovies={findMovies}
+              search={search}
+              isShort={isShort}
+              onClickCheckBox={checkShortMovies}
               foundMovies={foundMovies}
               savedMovies={savedMovies}
               setSavedMovies={setSavedMovies}
-              error={errorText}
+              handleChange={checkSearch}
+              handleSubmit={findMoviesSubmit}
+              error={searchError}
+              filmError={filmError}
             />
           </ProtectedRoute>} />
 
           <Route path="/saved-movies" element={<ProtectedRoute path="/saved-movies" isLoggedIn={isLoggedIn}>
             <SavedMovies
-              initialMovies={savedMovies}
+              initMovies={savedMovies}
               setSavedMovies={setSavedMovies}
             />
             </ProtectedRoute>} />

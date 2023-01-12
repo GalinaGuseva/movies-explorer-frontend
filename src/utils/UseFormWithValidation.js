@@ -30,7 +30,7 @@ export const useFormWithValidation = (inputValues) => {
         input.setCustomValidity(valMessages.password);
       }
     }
-    if (name === "search") {
+    if (name === "query") {
       input.setCustomValidity("");
 
       if (!input.validity.valid) {

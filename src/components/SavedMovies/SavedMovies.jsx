@@ -3,39 +3,60 @@ import "./SavedMovies.css";
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import * as mainApi from "../../utils/MainApi";
-import { filterMovies } from "../../utils/filterMovies";
-import { errorMessages } from "../../constants/constants";
+import { filterMovies, filterShortMovies } from "../../utils/filterMovies";
+import { ERRORS } from "../../constants/constants";
 
-export default function SavedMovies({ initialMovies, setSavedMovies }) {
-  const [filteredMovies, setFilteredMovies] = useState(initialMovies);
-  const [filter, setFilter] = useState({ query: "", isShort: false });
+export default function SavedMovies({ initMovies, setSavedMovies }) {
+  const [filteredMovies, setFilteredMovies] = useState(initMovies);
+  const [isShort, setIsShort] = useState(false);
+  const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [searchError, setSearchError] = useState("");
 
-  const searchInSavedMovies = (filter) => {
-    if (initialMovies.length) {
-      const filteredMovies = filterMovies(initialMovies, filter);
-      setFilteredMovies(filteredMovies);
-      if (filteredMovies.length === 0) {
-        setError(errorMessages.mov);
+  const checkShortSaved = (isShort) => setIsShort(isShort);
+  const checkSearchInSaved = (search) => setSearch(search);
+
+ const checkFilteredMovies = (initMovies, search, isShort) => {
+     const newMovies = filterMovies(initMovies, search);
+      const shortMovies = filterShortMovies(newMovies);
+      const foundMovies = isShort ? shortMovies : newMovies;
+      setFilteredMovies(foundMovies);
+      if (foundMovies.length === 0) {
+        setError(ERRORS.mov);
       } else setError("");
-    }  setFilter(filter);
+ }
+
+ const searchInSavedMovies = (e) => {
+  e.preventDefault();
+  if (!search) {
+    setSearchError(ERRORS.search)
+    setTimeout(() => (setSearchError("")), 2000);
+    return
+  }
+  if (search.length && initMovies.length) {
+      checkFilteredMovies(initMovies, search, isShort);
+      checkShortSaved(isShort);
+      checkSearchInSaved(search);
+      }
   };
 
   useEffect(() => {
-    if (initialMovies.length) {
-      const filteredMovies = filterMovies(initialMovies, filter);
-      setFilteredMovies(filteredMovies);
-      if (filteredMovies.length === 0) {
-        setError(errorMessages.mov);
-      } else setError("");
+   if (initMovies.length) {
+      checkFilteredMovies(initMovies, search, isShort);
     }
-  }, [initialMovies, filter]);
+    if (search) {
+      checkSearchInSaved(search);
+  }
+  if (isShort) {
+    checkShortSaved(isShort);
+  }
+  }, [initMovies, search, isShort]);
 
   const handleDeleteMovie = (movieId) => {
     mainApi
       .deleteMovie(movieId)
       .then(() => {
-        const newSavedMovies = initialMovies.filter((item) => item._id !== movieId);
+        const newSavedMovies = initMovies.filter((item) => item._id !== movieId);
         const newFilteredMovies = filteredMovies.filter(
           (item) => item._id !== movieId
         );
@@ -49,9 +70,12 @@ export default function SavedMovies({ initialMovies, setSavedMovies }) {
   return (
     <section className="saved-movies">
       <SearchForm
-        handleSearch={searchInSavedMovies}
-        filter={filter}
-        setFilter={setFilter}
+        handleChange={checkSearchInSaved}
+        handleSubmit={searchInSavedMovies}
+        search={search}
+        errorText={searchError}
+        isShort={isShort}
+        onClickCheckBox={checkShortSaved}
       />
        {error && <p className="saved-movies__error">{error}</p>}
         <MoviesCardList

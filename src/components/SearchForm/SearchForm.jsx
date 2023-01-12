@@ -1,40 +1,15 @@
 import React, { useState } from "react";
 import "./SearchForm.css";
 import { regExp } from "../../constants/RegExp";
-import { buttonMessage } from "../../constants/constants";
-import { valMessages } from "../../constants/valMessages";
+import { BUTTONMESSAGE } from "../../constants/constants";
 
-export default function SearchForm({ handleSearch, filter, setFilter, isLoading }) {
+export default function SearchForm({ handleChange, handleSubmit, search, isShort, onClickCheckBox, isLoading, errorText }) {
   const [message, setMessage] = useState(false);
-  const [errorText, setErrorText] = useState("");
-  const [values, setValues] = useState(filter);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!values.query) {
-      setErrorText(valMessages.search);
-      setTimeout(() => setErrorText(""), 3000);
-    } else {
-      setErrorText("");
-      handleSearch(values);
-      setFilter(values);
-    }
-  };
-
-  const handleChange = (e) => {
-    setValues({...values, query: e.target.value });
-  };
-
-  const onClickCheckBox = (e) => {
-    setValues({...values, isShort: e.target.checked});
-    setFilter({...values, isShort: e.target.checked});
-  };
-
-  const handleMessage =() => {
-     setMessage(buttonMessage);
-     setTimeout(() => setMessage(false), 2000);
-   }
-
+const handleMessage =() => {
+   setMessage(BUTTONMESSAGE);
+   setTimeout(() => setMessage(false), 2000);
+}
   return (
     <section className="search-form">
       <div className="search-form__container">
@@ -42,15 +17,18 @@ export default function SearchForm({ handleSearch, filter, setFilter, isLoading 
           <div className="search-form__wrapper">
              <span className="search-form__button icon link_button" onClick={handleMessage}/>
                <input
-                 className="search-form__input"
+                 className={`search-form__input ${
+                  isLoading ? "search-form__input_disabled" : ""
+                }`}
                  type="text"
-                 name="query"
+                 name="search"
                  minLength="1"
                  maxLength="70"
                  pattern={regExp.search}
                  placeholder="Фильм"
-                 onChange={handleChange}
-                 value={values.query}
+                 disabled={isLoading}
+                 onChange={e => handleChange(e.target.value)}
+                 value={search}
                  required
                />
           </div>
@@ -64,13 +42,16 @@ export default function SearchForm({ handleSearch, filter, setFilter, isLoading 
           ></button>
         </form>
 
-        <label className="search-form__shortfilms">
+        <label className={`search-form__shortfilms ${
+          isLoading && "search-form__shortfilms_disabled"
+        }`}>
           <input
             type="checkbox"
             className="search-form__checkbox"
             name="checkbox"
-            checked={values.isShort}
-            onChange={onClickCheckBox}
+            checked={isShort}
+            onChange={() => onClickCheckBox(!isShort)}
+            disabled={isLoading}
           />
           <div className="search-form__pseudobox">
             <span className="search-form__box"></span>
@@ -83,8 +64,9 @@ export default function SearchForm({ handleSearch, filter, setFilter, isLoading 
           type="checkbox"
           className="search-form__checkbox"
           name="checkbox"
-          checked={values.isShort}
-          onChange={onClickCheckBox}
+          checked={isShort}
+          onChange={() => onClickCheckBox(!isShort)}
+          disabled={isLoading}
         />
         <div className="search-form__pseudobox">
           <span className="search-form__box"></span>

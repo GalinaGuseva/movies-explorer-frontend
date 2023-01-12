@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./Profile.css";
 import { useFormWithValidation } from "../../utils/UseFormWithValidation";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
@@ -13,7 +13,7 @@ export default function Profile({
   const inputs = { name: '', email: '' };
   const { values, setValues, handleChange, errors, setIsValid, isValid } = useFormWithValidation(inputs);
   const { name, email } = useContext(CurrentUserContext);
-
+  const [isDisabled, setIsDisabled] = useState(true);
   useEffect(() => {
     setValues({ name, email });
     setIsValid(true);
@@ -23,6 +23,10 @@ export default function Profile({
     e.preventDefault();
     handleProfile(values);
   };
+
+  useEffect(() => {
+    setIsDisabled((values.name === name && values.email === email) || !isValid)
+}, [handleProfile, isValid, values, name, email]);
 
   return (
     <form name="profile" className="profile" onSubmit={handleSubmit} noValidate>
@@ -67,12 +71,12 @@ export default function Profile({
         <button
           type="submit"
           onClick={handleSubmit}
-          disabled={
-            !isValid || (values.name === name && values.email === email)
+          disabled={isDisabled}
+          className={
+            isDisabled
+            ? "profile__submit-btn profile__submit-btn_disabled"
+            : "profile__submit-btn link"
           }
-          className={`profile__submit-btn link ${
-            isValid || (values.name !== name && values.email !== email) ? "" : "profile__submit-btn_disabled"
-          }`}
         >
           Редактировать
         </button>

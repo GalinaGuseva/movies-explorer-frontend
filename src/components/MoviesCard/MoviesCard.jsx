@@ -13,7 +13,6 @@ export default function MoviesCard({ movie, savedMovies, isSaved, onDelete, onSa
   const [isUrl, setUrl] = useState("");
 
   useEffect(() => {
-    // окрашиваем кнопку, если фильм нашелся в сохраненных
     const isSaved = savedMovies.find((item) => item.movieId === movie.id);
     setSaved(isSaved);
   }, [movie, savedMovies]);
