@@ -14,6 +14,7 @@ export default function Profile({
   const { values, setValues, handleChange, errors, setIsValid, isValid } = useFormWithValidation(inputs);
   const { name, email } = useContext(CurrentUserContext);
   const [isDisabled, setIsDisabled] = useState(true);
+
   useEffect(() => {
     setValues({ name, email });
     setIsValid(true);

@@ -9,12 +9,10 @@ import { ERRORS } from "../../constants/constants";
 export default function SavedMovies({ initMovies, setSavedMovies }) {
   const [filteredMovies, setFilteredMovies] = useState(initMovies);
   const [isShort, setIsShort] = useState(false);
-  const [search, setSearch] = useState("");
   const [error, setError] = useState("");
-  const [searchError, setSearchError] = useState("");
+  const [search, setSearch] = useState("");
 
   const checkShortSaved = (isShort) => setIsShort(isShort);
-  const checkSearchInSaved = (search) => setSearch(search);
 
  const checkFilteredMovies = (initMovies, search, isShort) => {
      const newMovies = filterMovies(initMovies, search);
@@ -26,30 +24,18 @@ export default function SavedMovies({ initMovies, setSavedMovies }) {
       } else setError("");
  }
 
- const searchInSavedMovies = (e) => {
-  e.preventDefault();
-  if (!search) {
-    setSearchError(ERRORS.search)
-    setTimeout(() => (setSearchError("")), 2000);
-    return
-  }
+ const searchInSavedMovies = (search) => {
   if (search.length && initMovies.length) {
+      setSearch(search);
       checkFilteredMovies(initMovies, search, isShort);
       checkShortSaved(isShort);
-      checkSearchInSaved(search);
-      }
+    }
   };
 
   useEffect(() => {
    if (initMovies.length) {
       checkFilteredMovies(initMovies, search, isShort);
     }
-    if (search) {
-      checkSearchInSaved(search);
-  }
-  if (isShort) {
-    checkShortSaved(isShort);
-  }
   }, [initMovies, search, isShort]);
 
   const handleDeleteMovie = (movieId) => {
@@ -70,10 +56,9 @@ export default function SavedMovies({ initMovies, setSavedMovies }) {
   return (
     <section className="saved-movies">
       <SearchForm
-        handleChange={checkSearchInSaved}
-        handleSubmit={searchInSavedMovies}
+        handleSearch={searchInSavedMovies}
         search={search}
-        errorText={searchError}
+        setSearch={setSearch}
         isShort={isShort}
         onClickCheckBox={checkShortSaved}
       />

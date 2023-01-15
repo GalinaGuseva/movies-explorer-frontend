@@ -7,7 +7,6 @@ import './Header.css';
 export default function Header({ isLoggedIn, openMenu }) {
   return useRoutes([
     { path: '/', element: isLoggedIn ? <HeaderMain onShowMenu={openMenu} /> : <HeaderLanding /> },
-
     { path: '/movies', element: <HeaderMain onShowMenu={openMenu} /> },
     { path: '/saved-movies', element: <HeaderMain onShowMenu={openMenu} /> },
     { path: '/signup', element: '' },

@@ -5,25 +5,92 @@ import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import Preloader from "../Preloader/Preloader";
 import * as mainApi from "../../utils/MainApi";
 import { SCREEN_SIZE } from "../../constants/constants";
+import { filterMovies, filterShortMovies } from "../../utils/filterMovies";
+import { getMovies } from "../../utils/MoviesApi";
+import { ERRORS } from "../../constants/constants";
+
 
 export default function Movies({
   savedMovies,
   setSavedMovies,
-  foundMovies,
-  isLoading,
-  search,
-  onClickCheckBox,
-  isShort,
-  handleChange,
-  handleSubmit,
-  error,
-  filmError
 }) {
+  const [movies, setMovies] = useState([]);
   const [сountCards, setCountCards] = useState(null); // число карточек для отображения
   const [addCountCards, setAddCountCards] = useState(null); // число добавляемых карточек
   const [visibleMovies, setVisibleMovies] = useState([]); // фильмы, которые будут отображаться
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const { desktop, tablet, mobile } = SCREEN_SIZE;
+  const [isShort, setIsShort] = useState(false);
+  const [search, setSearch] = useState("");
+  const [foundMovies, setFoundMovies] = useState([]);
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const checkShortMovies = (isShort) => {
+    setIsShort(isShort);
+    localStorage.setItem("onlyShort", JSON.stringify(isShort));
+};
+
+ const checkSearch = (search) => {
+  setSearch(search);
+   localStorage.setItem("search", search);
+};
+
+const checkFoundMovies = (movies, search, isShort) => {
+     const newMovies = filterMovies(movies, search);
+     const shortMovies = filterShortMovies(newMovies);
+     const filteredMovies = isShort ? shortMovies : newMovies;
+     setFoundMovies(filteredMovies);
+     localStorage.setItem("foundMovies", JSON.stringify(filteredMovies));
+      if (filteredMovies.length === 0) {
+        setError(ERRORS.mov);
+      } else {
+        setError("");
+      }
+ };
+
+ useEffect(() => {
+  if (localStorage.getItem("foundMovies")) {
+    setFoundMovies(JSON.parse(localStorage.getItem("foundMovies")));
+  }
+  if (localStorage.getItem("search")) {
+    setSearch(localStorage.getItem("search"));
+  }
+    if (localStorage.getItem("onlyShort")) {
+    setIsShort(JSON.parse(localStorage.getItem("onlyShort")));
+  }
+  }, []);
+
+
+ const findMovies = (search) => {
+  if (search) {
+  const movies = JSON.parse(localStorage.getItem("movies"));
+  setMovies(movies);
+  checkSearch(search);
+  checkShortMovies(isShort);
+if (!movies || !movies.length) {
+  setIsLoading(true);
+  getMovies()
+    .then(res => {
+      setMovies(res);
+      localStorage.setItem("movies", JSON.stringify(res));
+      const initMovies = JSON.parse(localStorage.getItem("movies"));
+      const search = localStorage.getItem("search");
+      const isShort = localStorage.getItem("onlyShort");
+      checkFoundMovies(initMovies, search, isShort);
+    })
+    .catch((err) => {
+      setError(ERRORS.default);
+      console.log(err);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  } else {
+    checkFoundMovies(movies, search, isShort);
+  }
+ }
+};
 
   useEffect(() => {
     const handleResize = () => {
@@ -88,18 +155,18 @@ export default function Movies({
   return (
     <section className="movies">
       <SearchForm
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
+        handleSearch={findMovies}
+        setInitMovies={movies}
         isLoading={isLoading}
-        search={search}
-        errorText={error}
         isShort={isShort}
-        onClickCheckBox={onClickCheckBox}
+        onClickCheckBox={checkShortMovies}
+        search={search}
+        setSearch={setSearch}
       />
       {isLoading ? (
         <Preloader />
-      ) : filmError ? (
-        <p className="movies__error">{filmError}</p>
+      ) : error ? (
+        <p className="movies__error">{error}</p>
       ) : (
         <>
           <MoviesCardList

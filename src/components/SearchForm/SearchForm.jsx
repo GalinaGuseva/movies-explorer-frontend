@@ -2,9 +2,31 @@ import React, { useState } from "react";
 import "./SearchForm.css";
 import { regExp } from "../../constants/RegExp";
 import { BUTTONMESSAGE } from "../../constants/constants";
+import { ERRORS } from "../../constants/constants";
 
-export default function SearchForm({ handleChange, handleSubmit, search, isShort, onClickCheckBox, isLoading, errorText }) {
+export default function SearchForm({ handleSearch, search, setSearch, isShort, onClickCheckBox, isLoading }) {
+
   const [message, setMessage] = useState(false);
+  const [error, setError] = useState(false);
+  const [value, setValue] = useState(search);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!value.query) {
+      setError(ERRORS.search)
+      setTimeout(() => setError(""), 2000);
+      return
+      } else {
+      setError("");
+      const search = value.query;
+      setSearch(search);
+      handleSearch(search);
+    }
+  };
+
+  const handleChange = (e) => {
+    setValue({...value, query: e.target.value});
+  };
 
 const handleMessage =() => {
    setMessage(BUTTONMESSAGE);
@@ -21,14 +43,14 @@ const handleMessage =() => {
                   isLoading ? "search-form__input_disabled" : ""
                 }`}
                  type="text"
-                 name="search"
+                 name="query"
                  minLength="1"
                  maxLength="70"
                  pattern={regExp.search}
                  placeholder="Фильм"
                  disabled={isLoading}
-                 onChange={e => handleChange(e.target.value)}
-                 value={search}
+                 onChange={handleChange}
+                 value={value.query}
                  required
                />
           </div>
@@ -36,7 +58,7 @@ const handleMessage =() => {
             type="submit"
             aria-label="Кнопка поиска фильмов"
             className={`search-form__btn-submit link_button ${
-              errorText || isLoading ? "search-form__btn-submit link_button_disabled" : ""
+              error || isLoading ? "search-form__btn-submit link_button_disabled" : ""
             }`}
             onClick={handleSubmit}
           ></button>
@@ -73,7 +95,7 @@ const handleMessage =() => {
         </div>
         <span className="search-form__text">Короткометражки</span>
       </label>
-      <span className="search-form__input-error">{errorText}</span>
+      <span className="search-form__input-error">{error}</span>
       <span className="search-form__message">{message}</span>
     </section>
   );

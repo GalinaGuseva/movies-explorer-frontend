@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Header from "../Header/Header";
 import Main from "../Main/Main";
 import Footer from "../Footer/Footer";
@@ -12,62 +12,50 @@ import NotFound from "../NotFound/NotFound";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import * as mainApi from "../../utils/MainApi";
-import { getMovies } from "../../utils/MoviesApi";
 import { ERRORS } from "../../constants/constants";
-import { filterMovies, filterShortMovies } from "../../utils/filterMovies";
 
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [errorText, setErrorText] = useState(false);
-  const [searchError, setSearchError] = useState(false);
-  const [filmError, setFilmError] = useState(false);
   const [success, setIsSuccess] = useState(false);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
   const [savedMovies, setSavedMovies] = useState([]);
-  const [isShort, setIsShort] = useState(false);
-  const [search, setSearch] = useState("");
-  const [initMovies, setInitMovies] = useState([]);
-  const [foundMovies, setFoundMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-
-  const authCheck = () => {
-    mainApi
-      .getUser()
-      .then((res) => {
-        if (res) {
-          setLoggedIn(true);
-          setCurrentUser(res);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoggedIn(false);
-        localStorage.clear();
-        setCurrentUser({});
-      });
-  };
 
   useEffect(() => {
     authCheck();
   }, []);
 
+  const authCheck = () => {
+    mainApi
+      .getUser()
+      .then(res => {
+        if (res.name) {
+          setLoggedIn(true);
+          localStorage.setItem("isLoggedIn", true);
+          setCurrentUser({ name: res.name, email: res.email });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoggedIn(false);
+        setCurrentUser({});
+        localStorage.clear();
+      });
+  };
+
   const handleRegister = (data) => {
       mainApi
         .register(data)
-        .then(() => handleLogin(data))
-        .catch(err => {
-          if (err === "Ошибка 409") {
-            setErrorText(ERRORS.conf);
-            setTimeout(() => setErrorText(false), 2000);
-          } else {
-            setErrorText(ERRORS.reg);
-            setTimeout(() => setErrorText(false), 2000);
-          }
+        .then(() => {
+          handleLogin(data);
+        })
+        .catch((err) => {
           console.log(err);
+          setErrorText(ERRORS.reg);
+          setTimeout(() => setErrorText(false), 2000);
         });
   };
 
@@ -77,7 +65,7 @@ export default function App() {
         .then(() => {
           setIsSuccess(true);
           setTimeout(() => setIsSuccess(false), 2000);
-          setTimeout(() => setLoggedIn(true), 2000);
+          setTimeout(() => authCheck(), 2000);
         })
         .catch(err => {
           if (err === "Ошибка: 401") {
@@ -97,7 +85,7 @@ export default function App() {
       .then(() => {
         setLoggedIn(false);
         localStorage.clear();
-        setCurrentUser({});
+        setCurrentUser({ name: "", email: "" });
         navigate("/");
       })
       .catch((err) => {
@@ -128,73 +116,6 @@ export default function App() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const checkShortMovies = (isShort) => {
-    setIsShort(isShort);
-    localStorage.setItem("onlyShort", JSON.stringify(isShort));
-};
-
-  const checkSearch = (search) => {
-    setSearch(search);
-    localStorage.setItem("search", search);
-};
-
-const checkMovies = (movies) => {
-  setInitMovies(movies);
-  localStorage.setItem('movies', JSON.stringify(movies));
-};
-
-const checkFoundMovies = (initMovies, search, isShort) => {
-  if (search) {
-     const newMovies = filterMovies(initMovies, search);
-     const shortMovies = filterShortMovies(newMovies);
-     const filteredMovies = isShort ? shortMovies : newMovies;
-     setFoundMovies(filteredMovies);
-     localStorage.setItem("foundMovies", JSON.stringify(filteredMovies));
-      if (filteredMovies.length === 0) {
-        setFilmError(ERRORS.mov);
-      } else {
-        setFilmError("");
-      }
-    }
- };
-
-  useEffect(() => {
-    const movies = JSON.parse(localStorage.getItem("movies"));
-    checkMovies(movies);
-    checkFoundMovies(JSON.parse(localStorage.getItem("foundMovies")));
-    if (search) {
-    checkSearch(localStorage.getItem("search"));
-  }
-  if (isShort) {
-    checkShortMovies(JSON.parse(localStorage.getItem("onlyShort")));
-  }
-    if (!movies || !movies.length) {
-      setIsLoading(true);
-      getMovies()
-        .then(movies => {
-          checkMovies(movies);
-          checkFoundMovies(movies);
-        })
-        .catch((err) => {
-          setErrorText(ERRORS.default);
-          console.log(err);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-      }
-  }, [search, isShort]);
-
-  const findMoviesSubmit = (e) => {
-    e.preventDefault();
-    if (!search) {
-      setSearchError(ERRORS.search)
-      setTimeout(() => setSearchError(""), 2000);
-      return
-    }
-      checkFoundMovies(initMovies, search, isShort);
-    };
-
   useEffect(() => {
     if (localStorage.getItem("savedMovies")) {
       setSavedMovies(JSON.parse(localStorage.getItem("savedMovies")));
@@ -209,11 +130,6 @@ const checkFoundMovies = (initMovies, search, isShort) => {
     }
   }, [isLoggedIn]);
 
-  useEffect(() => {
-    if ((location.pathname === "/signup" || location.pathname === "/signin") && isLoggedIn) {
-      navigate("/movies")};
-  }, [ isLoggedIn, location.pathname, navigate]);
-
   return (
     <CurrentUserContext.Provider value={currentUser}>
     <div className="App">
@@ -221,32 +137,26 @@ const checkFoundMovies = (initMovies, search, isShort) => {
         <Menu isOpen={isMenuOpen} onClose={toggleMenu} />
         <Routes>
           <Route path="/" element={<Main />} />
-          <Route path="/movies" element={<ProtectedRoute path="/movies" isLoggedIn={isLoggedIn}>
+          <Route path="/movies" element={<ProtectedRoute isLoggedIn={ isLoggedIn }>
             <Movies
-              isLoading={isLoading}
-              search={search}
-              isShort={isShort}
-              onClickCheckBox={checkShortMovies}
-              foundMovies={foundMovies}
+             isLoggedIn={ isLoggedIn }
               savedMovies={savedMovies}
               setSavedMovies={setSavedMovies}
-              handleChange={checkSearch}
-              handleSubmit={findMoviesSubmit}
-              error={searchError}
-              filmError={filmError}
             />
           </ProtectedRoute>} />
 
-          <Route path="/saved-movies" element={<ProtectedRoute path="/saved-movies" isLoggedIn={isLoggedIn}>
+          <Route path="/saved-movies" element={<ProtectedRoute isLoggedIn={ isLoggedIn }>
             <SavedMovies
+              isLoggedIn={ isLoggedIn }
               initMovies={savedMovies}
               setSavedMovies={setSavedMovies}
             />
             </ProtectedRoute>} />
           <Route
             path="/profile"
-            element={<ProtectedRoute isLoggedIn={isLoggedIn}>
+            element={<ProtectedRoute isLoggedIn={ isLoggedIn }>
               <Profile
+                isLoggedIn={ isLoggedIn }
                 handleProfile={handleUpdateUser}
                 errorText={errorText}
                 success={success}
@@ -258,8 +168,9 @@ const checkFoundMovies = (initMovies, search, isShort) => {
           <Route
             exact
             path="/signup"
-            element={
+            element={ isLoggedIn ? <Navigate to='/movies' /> :
               <EnterForm
+                isLoggedIn={ isLoggedIn }
                 path={location.pathname}
                 title="Добро пожаловать!"
                 buttonTitle="Зарегистрироваться"
@@ -269,14 +180,13 @@ const checkFoundMovies = (initMovies, search, isShort) => {
                 onSubmit={handleRegister}
                 errorText={errorText}
                 success={success}
-              />
-            }
-          />
+                /> } />
           <Route
             exact
             path="/signin"
-            element={
+            element={ isLoggedIn ? <Navigate to='/movies' /> :
               <EnterForm
+                isLoggedIn={ isLoggedIn }
                 path={location.pathname}
                 title="Рады видеть!"
                 buttonTitle="Войти"
