@@ -61,6 +61,7 @@ if (!movies || !movies.length) {
       localStorage.setItem("movies", JSON.stringify(res));
       const values = JSON.parse(localStorage.getItem("values"));
       const movies = JSON.parse(localStorage.getItem("movies"));
+      console.log(values);
       resultList(movies, values.query, values.isShort);
     })
     .catch((err) => {
@@ -69,8 +70,12 @@ if (!movies || !movies.length) {
     })
     .finally(() => {
       setIsLoading(false);
+      return
     });
-  }  resultList(movies, values.query, values.isShort)
+  } else {
+    resultList(movies, values.query, values.isShort);
+    return
+  }
 };
 
 useEffect(() => {
