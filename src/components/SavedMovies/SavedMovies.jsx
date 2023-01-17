@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SavedMovies.css";
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
@@ -27,6 +27,16 @@ export default function SavedMovies({ movies, setSavedMovies }) {
      }
    }
  };
+
+ useEffect(() => {
+  if (movies.length) {
+    const filteredMovies = filterMovies(movies, values.query, values.isShort);
+    setFilteredMovies(filteredMovies);
+    if (filteredMovies.length === 0) {
+      setError(ERRORS.mov);
+    } else setError("");
+  }
+}, [movies, values.query, values.isShort]);
 
 const handleDeleteMovie = (movieId) => {
   mainApi
