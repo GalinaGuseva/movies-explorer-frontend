@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./SavedMovies.css";
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
@@ -6,20 +6,21 @@ import * as mainApi from "../../utils/MainApi";
 import filterMovies from "../../utils/filterMovies";
 import { ERRORS } from "../../constants/constants";
 
-export default function SavedMovies({ savedMovies, setSavedMovies }) {
+export default function SavedMovies({ movies, setSavedMovies }) {
   const [values, setValues] = useState({query: "", isShort: false});
   const [error, setError] = useState("");
-  const [filteredMovies, setFilteredMovies] = useState(savedMovies);
+  const [filteredMovies, setFilteredMovies] = useState([]);
 
  const handleShort = (e) => setValues({ ...values, isShort: e.target.checked });
 
  const handleSearchChange = (value) => setValues({ ...values, query: value });
 
  const searchInSavedMovies = () => {
-  if (savedMovies.length) {
-   const foundMovies = filterMovies(savedMovies, values.query, values.isShort);
+  if (movies.length) {
+   const foundMovies = filterMovies(movies, values.query, values.isShort);
     if (foundMovies.length === 0) {
        setError(ERRORS.mov);
+       setFilteredMovies([]);
      } else {
        setError("");
        setFilteredMovies(foundMovies);
@@ -27,21 +28,11 @@ export default function SavedMovies({ savedMovies, setSavedMovies }) {
    }
  };
 
- useEffect(() => {
-   if (savedMovies.length) {
-     const filteredMovies = filterMovies(savedMovies, values.query, values.isShort);
-     setFilteredMovies(filteredMovies);
-     if (filteredMovies.length === 0) {
-       setError(ERRORS.mov);
-     } else setError("");
-   }
- }, [savedMovies, values.query, values.isShort]);
-
 const handleDeleteMovie = (movieId) => {
   mainApi
     .deleteMovie(movieId)
     .then(() => {
-      const newSavedMovies = savedMovies.filter((item) => item._id !== movieId);
+      const newSavedMovies = movies.filter((item) => item._id !== movieId);
       const newFilteredMovies = filteredMovies.filter(
         (item) => item._id !== movieId
       );
