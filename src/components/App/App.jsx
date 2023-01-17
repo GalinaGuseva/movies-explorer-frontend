@@ -139,7 +139,7 @@ export default function App() {
           <Route path="/" element={<Main />} />
           <Route path="/movies" element={<ProtectedRoute isLoggedIn={ isLoggedIn }>
             <Movies
-             isLoggedIn={ isLoggedIn }
+              isLoggedIn={ isLoggedIn }
               savedMovies={savedMovies}
               setSavedMovies={setSavedMovies}
             />
@@ -148,7 +148,7 @@ export default function App() {
           <Route path="/saved-movies" element={<ProtectedRoute isLoggedIn={ isLoggedIn }>
             <SavedMovies
               isLoggedIn={ isLoggedIn }
-              initMovies={savedMovies}
+              savedMovies={savedMovies}
               setSavedMovies={setSavedMovies}
             />
             </ProtectedRoute>} />

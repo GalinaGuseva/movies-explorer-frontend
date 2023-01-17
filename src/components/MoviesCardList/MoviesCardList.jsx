@@ -5,7 +5,6 @@ import { useLocation } from "react-router-dom";
 
 export default function MoviesCardList({
   movies,
-  visibleMovies,
   foundMovies,
   handleButtonMore,
   onDeleteMovie,
@@ -27,7 +26,7 @@ export default function MoviesCardList({
       />
     ))}
   </ul>
-  {location.pathname === "/movies" && (visibleMovies.length < foundMovies.length) && (
+  {location.pathname === "/movies" && (movies.length < foundMovies.length) && (
     <button
       className="movies-list__button-more link_button" aria-label="Загрузить еще фильмы"
       onClick={handleButtonMore}

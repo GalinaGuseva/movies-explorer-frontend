@@ -5,79 +5,63 @@ import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import Preloader from "../Preloader/Preloader";
 import * as mainApi from "../../utils/MainApi";
 import { SCREEN_SIZE } from "../../constants/constants";
-import { filterMovies, filterShortMovies } from "../../utils/filterMovies";
+import filterMovies from "../../utils/filterMovies";
 import { getMovies } from "../../utils/MoviesApi";
 import { ERRORS } from "../../constants/constants";
 
-
 export default function Movies({
+  isLoggedIn,
   savedMovies,
   setSavedMovies,
 }) {
-  const [movies, setMovies] = useState([]);
   const [сountCards, setCountCards] = useState(null); // число карточек для отображения
   const [addCountCards, setAddCountCards] = useState(null); // число добавляемых карточек
-  const [visibleMovies, setVisibleMovies] = useState([]); // фильмы, которые будут отображаться
+  const [movies, setMovies] = useState([]); // фильмы, которые будут отображаться
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const { desktop, tablet, mobile } = SCREEN_SIZE;
-  const [isShort, setIsShort] = useState(false);
-  const [search, setSearch] = useState("");
-  const [foundMovies, setFoundMovies] = useState([]);
+  const [values, setValues] = useState({query: "", isShort: false});
+  const [lastResult, setLastResult] = useState([]);
+  const [foundMovies, setFoundMovies] = useState(lastResult || []);
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const checkShortMovies = (isShort) => {
-    setIsShort(isShort);
-    localStorage.setItem("onlyShort", JSON.stringify(isShort));
-};
+  const handleShort = (e) => setValues({ ...values, isShort: e.target.checked });
 
- const checkSearch = (search) => {
-  setSearch(search);
-   localStorage.setItem("search", search);
-};
-
-const checkFoundMovies = (movies, search, isShort) => {
-     const newMovies = filterMovies(movies, search);
-     const shortMovies = filterShortMovies(newMovies);
-     const filteredMovies = isShort ? shortMovies : newMovies;
-     setFoundMovies(filteredMovies);
-     localStorage.setItem("foundMovies", JSON.stringify(filteredMovies));
-      if (filteredMovies.length === 0) {
-        setError(ERRORS.mov);
-      } else {
-        setError("");
-      }
- };
+ const handleSearchChange = (value) => setValues({ ...values, query: value });
 
  useEffect(() => {
   if (localStorage.getItem("foundMovies")) {
     setFoundMovies(JSON.parse(localStorage.getItem("foundMovies")));
   }
-  if (localStorage.getItem("search")) {
-    setSearch(localStorage.getItem("search"));
-  }
-    if (localStorage.getItem("onlyShort")) {
-    setIsShort(JSON.parse(localStorage.getItem("onlyShort")));
+  if (localStorage.getItem("values")) {
+    setValues(localStorage.getItem("values"));
   }
   }, []);
 
+  const resultList = (movies, query, isShort) => {
+    const newMovies = filterMovies(movies, query, isShort);
+    if (newMovies.length === 0) {
+      setError(ERRORS.mov);
+    } else {
+      setError("");
+      setFoundMovies(newMovies);
+      setLastResult(newMovies);
+      localStorage.setItem("foundMovies", JSON.stringify(newMovies));
+    }
+};
 
- const findMovies = (search) => {
-  if (search) {
+ const findMovies = () => {
   const movies = JSON.parse(localStorage.getItem("movies"));
-  setMovies(movies);
-  checkSearch(search);
-  checkShortMovies(isShort);
+  localStorage.setItem("values", JSON.stringify(values));
+  setValues(values);
 if (!movies || !movies.length) {
   setIsLoading(true);
   getMovies()
     .then(res => {
-      setMovies(res);
       localStorage.setItem("movies", JSON.stringify(res));
-      const initMovies = JSON.parse(localStorage.getItem("movies"));
-      const search = localStorage.getItem("search");
-      const isShort = localStorage.getItem("onlyShort");
-      checkFoundMovies(initMovies, search, isShort);
+      const values = JSON.parse(localStorage.getItem("values"));
+      const movies = JSON.parse(localStorage.getItem("movies"));
+      resultList(movies, values.query, values.isShort);
     })
     .catch((err) => {
       setError(ERRORS.default);
@@ -86,11 +70,21 @@ if (!movies || !movies.length) {
     .finally(() => {
       setIsLoading(false);
     });
-  } else {
-    checkFoundMovies(movies, search, isShort);
-  }
- }
+  }  resultList(movies, values.query, values.isShort)
 };
+
+useEffect(() => {
+  setFoundMovies(lastResult || []);
+}, [lastResult]);
+
+useEffect(() => {
+  if (isLoggedIn) {
+    const lastSearch = JSON.parse(localStorage.getItem("foundMovies"));
+    if (lastSearch) setLastResult(lastSearch);
+    const prevValues = JSON.parse(localStorage.getItem("values"));
+    if (prevValues) setValues(prevValues);
+  }
+}, [isLoggedIn]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -117,12 +111,12 @@ if (!movies || !movies.length) {
 
   useEffect(() => {
     const newMovies = foundMovies.slice(0, сountCards);
-    setVisibleMovies(newMovies);
+    setMovies(newMovies);
   }, [сountCards, foundMovies]);
 
   const handleButtonMore = () => {
-    setVisibleMovies(
-      visibleMovies.concat(foundMovies.slice(visibleMovies.length, visibleMovies.length + addCountCards))
+    setMovies(
+      movies.concat(foundMovies.slice(movies.length, movies.length + addCountCards))
   );
   };
 
@@ -156,12 +150,11 @@ if (!movies || !movies.length) {
     <section className="movies">
       <SearchForm
         handleSearch={findMovies}
-        setInitMovies={movies}
         isLoading={isLoading}
-        isShort={isShort}
-        onClickCheckBox={checkShortMovies}
-        search={search}
-        setSearch={setSearch}
+        value={values.query}
+        isShort={values.isShort}
+        onChange={handleSearchChange}
+        onClickCheckBox={handleShort}
       />
       {isLoading ? (
         <Preloader />
@@ -170,12 +163,11 @@ if (!movies || !movies.length) {
       ) : (
         <>
           <MoviesCardList
-            movies={visibleMovies}
             handleButtonMore={handleButtonMore}
             onDeleteMovie={handleDeleteMovie}
             onSaveMovie={handleSaveMovie}
             savedMovies={savedMovies}
-            visibleMovies={visibleMovies}
+            movies={movies}
             foundMovies={foundMovies}
           />
         </>

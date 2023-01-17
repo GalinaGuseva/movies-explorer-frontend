@@ -4,34 +4,29 @@ import { regExp } from "../../constants/RegExp";
 import { BUTTONMESSAGE } from "../../constants/constants";
 import { ERRORS } from "../../constants/constants";
 
-export default function SearchForm({ handleSearch, search, setSearch, isShort, onClickCheckBox, isLoading }) {
+export default function SearchForm({ handleSearch, onChange, value, isShort, onClickCheckBox, isLoading }) {
 
   const [message, setMessage] = useState(false);
   const [error, setError] = useState(false);
-  const [value, setValue] = useState(search);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!value.query) {
+    if (!value) {
       setError(ERRORS.search)
       setTimeout(() => setError(""), 2000);
       return
       } else {
       setError("");
-      const search = value.query;
-      setSearch(search);
-      handleSearch(search);
+      handleSearch();
     }
   };
 
-  const handleChange = (e) => {
-    setValue({...value, query: e.target.value});
-  };
+  const handleChange = (e) => onChange(e.target.value);
 
-const handleMessage =() => {
-   setMessage(BUTTONMESSAGE);
-   setTimeout(() => setMessage(false), 2000);
-}
+  const handleMessage =() => {
+     setMessage(BUTTONMESSAGE);
+     setTimeout(() => setMessage(false), 2000);
+  }
   return (
     <section className="search-form">
       <div className="search-form__container">
@@ -43,14 +38,14 @@ const handleMessage =() => {
                   isLoading ? "search-form__input_disabled" : ""
                 }`}
                  type="text"
-                 name="query"
+                 name="search"
                  minLength="1"
                  maxLength="70"
                  pattern={regExp.search}
                  placeholder="Фильм"
                  disabled={isLoading}
                  onChange={handleChange}
-                 value={value.query}
+                 value={value}
                  required
                />
           </div>
@@ -72,7 +67,8 @@ const handleMessage =() => {
             className="search-form__checkbox"
             name="checkbox"
             checked={isShort}
-            onChange={() => onClickCheckBox(!isShort)}
+            value={isShort}
+            onChange={onClickCheckBox}
             disabled={isLoading}
           />
           <div className="search-form__pseudobox">
@@ -87,7 +83,8 @@ const handleMessage =() => {
           className="search-form__checkbox"
           name="checkbox"
           checked={isShort}
-          onChange={() => onClickCheckBox(!isShort)}
+          value={isShort}
+          onChange={onClickCheckBox}
           disabled={isLoading}
         />
         <div className="search-form__pseudobox">
