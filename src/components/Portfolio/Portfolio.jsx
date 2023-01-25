@@ -1,5 +1,5 @@
-import React from 'react';
-import './Portfolio.css';
+import React from "react";
+import "./Portfolio.css";
 
 export default function Portfolio() {
   return (
@@ -9,7 +9,7 @@ export default function Portfolio() {
         <li className="portfolio__item">
           <a
             className="portfolio__link link"
-            href="https://github.com/GalinaGuseva/how-to-learn"
+            href="https://galinaguseva.github.io/how-to-learn/"
             target="_blank"
             rel="noopener noreferrer"
           >
